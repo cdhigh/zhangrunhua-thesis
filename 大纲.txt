@@ -19,3 +19,4 @@ PIC单片机实现的功能有：
 
 论文最新进度可以在下面网址看到：
 http://zhangrunhua-thesis.googlecode.com/svn/trunk
+
