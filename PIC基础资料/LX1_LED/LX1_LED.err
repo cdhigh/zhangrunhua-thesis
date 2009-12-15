@@ -1,0 +1,7 @@
+Message[302] F:\PIC_LX\LX1_LED\LX1_LED.ASM 10 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[305] F:\PIC_LX\LX1_LED\LX1_LED.ASM 17 : Using default destination of 1 (file).
+Message[305] F:\PIC_LX\LX1_LED\LX1_LED.ASM 22 : Using default destination of 1 (file).
+Message[305] F:\PIC_LX\LX1_LED\LX1_LED.ASM 33 : Using default destination of 1 (file).
+Message[305] F:\PIC_LX\LX1_LED\LX1_LED.ASM 38 : Using default destination of 1 (file).
+Message[305] F:\PIC_LX\LX1_LED\LX1_LED.ASM 47 : Using default destination of 1 (file).
+Message[305] F:\PIC_LX\LX1_LED\LX1_LED.ASM 49 : Using default destination of 1 (file).
