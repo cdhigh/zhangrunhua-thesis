@@ -1,0 +1,10 @@
+        RETLW        0XC0;0
+        RETLW        0XF9;1
+        RETLW        0XA4;2
+        RETLW        0XB0;3
+        RETLW        0X99;4
+        RETLW        0X92;5
+        RETLW        0X82;6
+        RETLW        0XF8;7
+        RETLW        0X80;8
+        RETLW        0X90;9
