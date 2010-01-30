@@ -85,10 +85,13 @@ TABLE1	ADDWF	PCL,1
 	RETLW        0X10;
 
 delay200ms	;调用延时子程序.
-	CLRF	Delay_Cnt0
+	MOVLW	0X12
 	MOVWF	Delay_Cnt0
-delayLoopA
+
+delayLoopA	CLRF	Delay_Cnt1
+delayLoopB	DECFSZ	Delay_Cnt1
+	GOTO	delayLoopB
 	DECFSZ	Delay_Cnt0
 	GOTO	delayLoopA
-	RETURN
-	END
+	RETURN	
+	END	
