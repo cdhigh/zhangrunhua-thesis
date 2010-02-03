@@ -1,6 +1,5 @@
 	LIST	P=16F716
 	INCLUDE	P16F716.INC
-;	__CONFIG _WDT_OFF & _PWRTE_ON & _MCLRE_OFF & _BODEN_OFF
 Delay_Cnt0	EQU	0x20
 Delay_Cnt1	EQU	0x21
 LED_OutCnt	EQU	0x22
@@ -23,19 +22,53 @@ Volume_Cnt	EQU	0x2A
 	CLRF	PORTA
 	CLRF	PORTB
 ;初始化完毕
-
-;*****************输入数字分离BCD码结果到w*****************
+;*****************++*****************
 	MOVLW	0x78
-	MOVWF	Volume_Data
-Loop_Volume	MOVLW	
-;*****************延时20ms子程序*****************
-delay20ms
-	MOVLW	0x12
-	MOVWF	Delay_Cnt0
-delayLoopA	CLRF	Delay_Cnt1
-delayLoopB	DECFSZ	Delay_Cnt1
-	GOTO	delayLoopB
-	DECFSZ	Delay_Cnt0
-	GOTO	delayLoopA
-	RETURN
+SET_Volume	MOVWF	Volume_Data
+	BSF		PORTB,4						;DATA:D0_RISE
+	BSF		PORTB,5						;CLOCK:0_RISE
+	BCF		PORTB,4						;DATA:D0_FALL
+	BCF		PORTB,5						;CLOCK:0_FALL
+	BSF		PORTB,5						;CLOCK:1_RISE
+	BCF		PORTB,5						;CLOCK:1_FALL
+	BTFSS	Volume_Data,2
+	BSF		PORTB,4						;DATA:D2_RISE
+	BSF		PORTB,5						;CLOCK:2_RISE
+	BCF		PORTB,4						;DATA:D2_FALL
+	BCF		PORTB,5						;CLOCK:2_FALL
+	BTFSS	Volume_Data,3
+	BSF		PORTB,4						;DATA:D3_RISE
+	BSF		PORTB,5						;CLOCK:3_RISE
+	BCF		PORTB,4						;DATA:D3_FALL
+	BCF		PORTB,5						;CLOCK:3_FALL
+	BTFSS	Volume_Data,4
+	BSF		PORTB,4						;DATA:D4_RISE
+	BSF		PORTB,5						;CLOCK:4_RISE
+	BCF		PORTB,4						;DATA:D4_FALL
+	BCF		PORTB,5						;CLOCK:4_FALL
+	BTFSS	Volume_Data,5
+	BSF		PORTB,4						;DATA:D5_RISE
+	BSF		PORTB,5						;CLOCK:5_RISE
+	BCF		PORTB,4						;DATA:D5_FALL
+	BCF		PORTB,5						;CLOCK:5_FALL
+	BTFSS	Volume_Data,6
+	BSF		PORTB,4						;DATA:D6_RISE
+	BSF		PORTB,5						;CLOCK:6_RISE
+	BCF		PORTB,4						;DATA:D6_FALL
+	BCF		PORTB,5						;CLOCK:6_FALL
+	BTFSS	Volume_Data,0
+	BSF		PORTB,4						;DATA:D7_RISE
+	BSF		PORTB,5						;CLOCK:7_RISE
+	BCF		PORTB,4						;DATA:D7_FALL
+	BCF		PORTB,5						;CLOCK:7_FALL
+	BTFSS	Volume_Data,1
+	BSF		PORTB,4						;DATA:D8_RISE
+	BSF		PORTB,5						;CLOCK:8_RISE
+	BCF		PORTB,4						;DATA:D8_FALL
+	BCF		PORTB,5						;CLOCK:8_FALL
+	BSF		PORTB,4						;DATA:D9.10_RISE
+	BSF		PORTB,5						;CLOCK:9_RISE
+	BCF		PORTB,5						;CLOCK:9_FALL
+	BSF		PORTB,5						;CLOCK:10_RISE
+	BCF		PORTB,5						;CLOCK:10_FALL
 	END
