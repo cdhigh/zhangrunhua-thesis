@@ -28,6 +28,7 @@ Key_AD_Count	EQU	0x1E
 ;功能描述：按键扫描，扫描一次，总共次数累计于Key_AD_Count。如果结果不为0，结果放Key_Record
 ;----------------------------------------------------------
 Key_Scan
+	BCF		Key_Record,0		;置转换成功标志0
 	BCF		STATUS,RP0			;体0
 	BSF		ADCON0,2			;开启A/D
 Wait_AD
@@ -41,22 +42,24 @@ Wait_AD
 	GOTO	Key_Scan_Success
 	BTFSC	ADRES,4
 	GOTO	Key_Scan_Success
-	GOTO	Key_Scan_0	
+	GOTO	Key_Scan_0
 Key_Scan_Success
 	MOVF	ADRES,W				;A/D值到W
 	ANDLW	B'11111000'			;低位 置0 舍弃，防止按键不稳干扰
 	XORWF	Key_Record,W		;新旧按键值对比
 	BTFSC	STATUS,Z			;测试异或结果，新旧按键不同则重置计数
 	GOTO	Key_Scan_0
-	INCF	Key_AD_Count		;如果相同计数+1		
+	INCF	Key_AD_Count		;如果相同计数+1
 NO_Recount
 	MOVF	ADRES,W				;更新按键记录
-	ANDLW	B'11111000'			;低位 置0 舍弃，防止按键不稳干扰	
+	ANDLW	B'11111000'			;低位 置0 舍弃，防止按键不稳干扰
 	MOVWF	Key_Record			;本次AD扫描结果放Key_Record，本次扫描成功检测键值结束
+	BSF		Key_Record,0		;置Key_Record,0位为1，做转换成功标志
 	GOTO	Key_Scan_End
 Key_Scan_0
 	MOVLW	0					;重置计数
 	MOVWF	Key_AD_Count
+	BCF		Key_Record,0		;置转换成功标志0
 Key_Scan_End
 	RETURN						;函数返回
 	END
