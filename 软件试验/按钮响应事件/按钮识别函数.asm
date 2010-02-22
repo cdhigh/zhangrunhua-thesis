@@ -39,19 +39,19 @@ Key_Act
 	GOTO	Key_OK_End
 
 	MOVF	Key_Record,0
-	XORLW	Key_Vol_Fall				;将Key_Record与Key_Vol_Fall对比
+	XORLW	Key_Vol_Fall			;将Key_Record与Key_Vol_Fall对比
 	BTFSS	STATUS,Z				;测试结果是否0
 	CALL	Action_Vol_Fall
 	GOTO	Key_OK_End
 
 	MOVF	Key_Record,0
-	XORLW	Key_Vol_Rise				;将Key_Record与Key_Vol_Rise对比
+	XORLW	Key_Vol_Rise			;将Key_Record与Key_Vol_Rise对比
 	BTFSS	STATUS,Z				;测试结果是否0
 	CALL	Action_Vol_Rise
 	GOTO	Key_OK_End
 
 	MOVF	Key_Record,0
-	XORLW	Key_Vol_Slient				;将Key_Record与Key_Vol_Slient对比
+	XORLW	Key_Vol_Slient			;将Key_Record与Key_Vol_Slient对比
 	BTFSS	STATUS,Z				;测试结果是否0
 	CALL	Action_Vol_Slient
 Key_OK_End

@@ -9,8 +9,7 @@ LED_DataH	EQU 0x25
 LED_DataL	EQU 0x26
 LED_Data	EQU 0x27
 Volume_Data	EQU 0x28
-Volume_Code	EQU 0x29
-Volume_Cnt	EQU	0x2A
+Volume_Cnt	EQU 0x29
 ;初始化
 	ORG	0x00
 	BSF	STATUS,RP0
@@ -22,7 +21,12 @@ Volume_Cnt	EQU	0x2A
 	CLRF	PORTA
 	CLRF	PORTB
 ;初始化完毕
-;*****************++*****************
+;----------------------------------------------------------
+;函数名称：SET_Volume
+;输入参数：音量Volume_Data
+;输出参数：
+;功能描述：M64629驱动
+;----------------------------------------------------------
 	MOVLW	0x78
 SET_Volume	MOVWF	Volume_Data
 	BSF		PORTB,4						;DATA:D0_RISE

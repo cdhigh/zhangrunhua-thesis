@@ -5,6 +5,7 @@
 #define		Key_Vol_Fall	1300
 #define		Key_Vol_Slient	1300
 #define		Key_Power		1300
+Main_Status		EQU	0x10		;B7:电源状态;B6:喇叭继电器;B5:音量升降标志
 Key_Record		EQU	0x1D
 Key_AD_Count	EQU	0x1E
 ;初始化
@@ -39,19 +40,23 @@ Key_Act
 	GOTO	Key_OK_End
 
 	MOVF	Key_Record,0
-	XORLW	Key_Vol_Fall				;将Key_Record与Key_Vol_Fall对比
+	XORLW	Key_Vol_Fall			;将Key_Record与Key_Vol_Fall对比
 	BTFSS	STATUS,Z				;测试结果是否0
-	CALL	Action_Vol_Fall
+	BCF		Main_Status,5			;升降音量设为降
+	BCF		Main_Status,4			;不使用音量直调
+	CALL	Action_Vol
 	GOTO	Key_OK_End
 
 	MOVF	Key_Record,0
-	XORLW	Key_Vol_Rise				;将Key_Record与Key_Vol_Rise对比
+	XORLW	Key_Vol_Rise			;将Key_Record与Key_Vol_Rise对比
 	BTFSS	STATUS,Z				;测试结果是否0
-	CALL	Action_Vol_Rise
+	BCF		Main_Status,4			;不使用音量直调
+	BSF		Main_Status,5			;升降音量设为升
+	CALL	Action_Vol
 	GOTO	Key_OK_End
 
 	MOVF	Key_Record,0
-	XORLW	Key_Vol_Slient				;将Key_Record与Key_Vol_Slient对比
+	XORLW	Key_Vol_Slient			;将Key_Record与Key_Vol_Slient对比
 	BTFSS	STATUS,Z				;测试结果是否0
 	CALL	Action_Vol_Slient
 Key_OK_End

@@ -5,54 +5,56 @@ Delay_Cnt0	EQU	0x20
 Delay_Cnt1	EQU	0x21
 LED_OutCnt	EQU	0x22
 LED_HalfDat	EQU	0x23
-LED_CS		EQU 0x24
-LED_DataH	EQU 0x25
-LED_DataL	EQU 0x26
-LED_Data	EQU 0x27
+LED_CS		EQU	0x24
+LED_DataH	EQU	0x25
+LED_DataL	EQU	0x26
+LED_Data	EQU	0x27
 ;初始化
-	ORG	0x00
-	BSF	STATUS,RP0
+	ORG		0x00
+	BSF		STATUS,RP0
 	MOVLW	B'00000000'
 	MOVWF	TRISA
 	MOVLW	B'00000000'
 	MOVWF	TRISB
-	BCF	STATUS,RP0
+	BCF		STATUS,RP0
 	CLRF	PORTA
 	CLRF	PORTB
 ;初始化完毕
-	
-;*****************输入数字分离BCD码结果到w*****************
-	MOVLW	0x1e
+;----------------------------------------------------------
+;函数名称：LED_Display
+;输入参数：音量Volume_Data;Main_Status,5:音量升降标志;Main_Status,6:音量直调标志
+;输出参数：
+;功能描述：音量调整
+;----------------------------------------------------------
+LED_Display
+;输入数字分离BCD码结果到w
+	MOVLW	0x1E
 	MOVWF	LED_Data				;输入LED_Data到W
-	
-	MOVF    LED_Data,0
-	MOVWF   LED_HalfDat
-	SWAPF   LED_Data,0
-	ANDLW   0X0F
-	CALL    BIN_HIGHHALF_BCD_TABLE
-	MOVWF   LED_Data
-	MOVF    LED_HalfDat,0
-	ANDLW   0X0F
-	CALL    BIN_LOWHALF_BCD_TABLE
-	ADDWF   LED_Data,0
-	MOVWF   LED_HalfDat
-	ANDLW   0XF0
-	MOVWF   LED_Data
-	MOVF    LED_HalfDat,0
-	ANDLW   0X0F
-	CALL    BIN_LOWHALF_BCD_TABLE
-	ADDWF   LED_Data,1				;转换结果到LED_Data
-	
+	MOVF	LED_Data,0
+	MOVWF	LED_HalfDat
+	SWAPF	LED_Data,0
+	ANDLW	0X0F
+	CALL	BIN_HIGHHALF_BCD_TABLE
+	MOVWF	LED_Data
+	MOVF	LED_HalfDat,0
+	ANDLW	0X0F
+	CALL	BIN_LOWHALF_BCD_TABLE
+	ADDWF	LED_Data,0
+	MOVWF	LED_HalfDat
+	ANDLW	0XF0
+	MOVWF	LED_Data
+	MOVF	LED_HalfDat,0
+	ANDLW	0X0F
+	CALL	BIN_LOWHALF_BCD_TABLE
+	ADDWF	LED_Data,1				;转换结果到LED_Data
 	MOVLW	0xF0					;将0F送LED_DataH，等AND做筛选
 	MOVWF	LED_DataH
 	MOVLW	0x0F					;将0F送LED_DataL，等AND做筛选
 	MOVWF	LED_DataL
-	MOVF    LED_Data,0
+	MOVF	LED_Data,0
 	ANDWF	LED_DataH,1
 	SWAPF	LED_DataH,1
 	ANDWF	LED_DataL,1				;将AND结果放w，准备查表转换
-	
-
 LOOP_LED	BTFSS	LED_CS,0		;根据LED_CS将LED_Data转到w
 	MOVF	LED_DataH,0
 	BTFSC	LED_CS,0
@@ -84,16 +86,16 @@ LOOP_BYTE
 	SLEEP
 ;*****************段码表*****************
 TABLE1	ADDWF	PCL,1
-	RETLW        0X40;
-	RETLW        0X79;
-	RETLW        0X24;
-	RETLW        0X30;
-	RETLW        0X19;
-	RETLW        0X12;
-	RETLW        0X02;
-	RETLW        0X58;
-	RETLW        0X00;
-	RETLW        0X10;
+	RETLW	0X40;
+	RETLW	0X79;
+	RETLW	0X24;
+	RETLW	0X30;
+	RETLW	0X19;
+	RETLW	0X12;
+	RETLW	0X02;
+	RETLW	0X58;
+	RETLW	0X00;
+	RETLW	0X10;
 ;***************用于将高半字节的BIN码换成整字节的压缩BCD码**********
 BIN_HIGHHALF_BCD_TABLE
 	ADDWF    PCL,1
@@ -124,7 +126,6 @@ BIN_LOWHALF_BCD_TABLE
 	RETLW    B'00010011'     ;D
 	RETLW    B'00010100'     ;E
 	RETLW    B'00010101'     ;F
-
 ;*****************延时20ms子程序*****************
 delay20ms
 	MOVLW	0x12
