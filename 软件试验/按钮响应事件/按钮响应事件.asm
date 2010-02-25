@@ -18,14 +18,13 @@ Main_Status		EQU	0x10		;B7:µçÔ´×´Ì¬;B6:À®°È¼ÌµçÆ÷;B5:ÒôÁ¿Éı½µ±êÖ¾;B4:ÒôÁ¿Ö±µ÷±êÖ
 ;¹¦ÄÜÃèÊö£º¿ª¹ØµçÔ´
 ;----------------------------------------------------------
 Action_Power_OnOff
-	BTFSS	Main_Status,7
-	BSF		PORTB,1					;B1µçÔ´¿ØÖÆ½Óµã
 	BTFSC	Main_Status,7
+	BSF		PORTB,1					;B1µçÔ´¿ØÖÆ½Óµã
+	BTFSS	Main_Status,7
 	BCF		PORTB,1					;B1µçÔ´¿ØÖÆ½Óµã
 	MOVLW	B'10000000'				;½«Main_Status×î¸ßÎ»È¡·´
 	XORWF	Main_Status,1
 	RETURN
-
 ;----------------------------------------------------------
 ;º¯ÊıÃû³Æ£ºAction_Vol
 ;ÊäÈë²ÎÊı£ºÒôÁ¿Volume_Data;Main_Status,5:ÒôÁ¿Éı½µ±êÖ¾;Main_Status,6:ÒôÁ¿Ö±µ÷±êÖ¾
@@ -33,12 +32,18 @@ Action_Power_OnOff
 ;¹¦ÄÜÃèÊö£ºÒôÁ¿µ÷Õû
 ;----------------------------------------------------------
 Action_Vol
-	BTFSS	Main_Status,4			;ÅĞ¶ÏÊÇ·ñÒôÁ¿Ö±½Óµ÷Õû
-	GOTO	Vol_Set_Direct_End
+	;ÒôÁ¿Ö±µ÷
+	BTFSC	Main_Status,4			;ÅĞ¶ÏÊÇ·ñÒôÁ¿Ö±½Óµ÷Õû
+	GOTO	Vol_Set_End
+	;ÒôÁ¿²½½ø
+	BTFSC	Main_Status,5			;ÅĞ¶ÏÒôÁ¿Éı½µ
+	INCF	Volume_Data,1			;Volume_DataÖµ×Ô¼Ó1
+	BTFSS	Main_Status,5			;ÅĞ¶ÏÒôÁ¿Éı½µ
+	DECF	Volume_Data,1			;Volume_DataÖµ×Ô¼õ1
+Vol_Set_End
 	CALL	SET_Volume				;µ÷ÓÃSET_VolumeÇı¶¯M64629
 	MOVF	Volume_Data				;½«µ±Ç°ÒôÁ¿Öµ¸´ÖÆµ½
 	MOVWF	LED_Data
-	CALL	
-Vol_Set_Direct_End
+	CALL	LED_Display				;ÏÔÊ¾Êı×Ö
 	RETURN
 	END
