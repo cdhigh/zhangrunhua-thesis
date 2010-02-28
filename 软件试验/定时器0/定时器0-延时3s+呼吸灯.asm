@@ -5,7 +5,12 @@ Delay_3s_Cnt	EQU	0x1F
 	NOP
 ;初始化
 	ORG	0x00
-;延时3s
+;----------------------------------------------------------
+;函数名称：Delay_3s
+;输入参数：
+;输出参数：
+;功能描述：延时3秒启动系统，期间呼吸灯闪4次
+;----------------------------------------------------------
 Delay_3s
 	BSF		OPTION_REG,0			;分频比256
 	BSF		OPTION_REG,1			;分频比256
@@ -24,5 +29,4 @@ Delay_3s_1	BTFSS	INTCON,T0IF		;Timer0溢出否?
 	;呼吸灯结束
 	DECFSZ	Delay_3s_Cnt,1			;减一次Delay_3s_Cnt,到0跳下句
 	GOTO	Delay_3s_1				;继续Delay_3s_1
-	RETURN							;是!返回子程序调用
 	END
