@@ -4,16 +4,21 @@ Volume_Data	EQU	0x28
 	ORG	0x00
 ;初始化
 ;读数据
-
-ReadEEPROM
+;----------------------------------------------------------
+;函数名称：Read_EEPROM
+;功能描述：读取EEPROM上次音量值数据
+;输入参数：读入地址到w
+;输出参数：输出数据在w
+;----------------------------------------------------------
+Read_EEPROM
 	BCF		STATUS,RP0		; Bank0
-	MOVWF	EEADR			; 将地址赋予EEADR
+	MOVWF	EEADR			;将地址赋予EEADR
 	BSF		STATUS,RP0		; Bank1
-	BSF		EECON1,RD		; EE Read
+	BSF		EECON1,RD		;读EEPROM
 	BCF		STATUS,RP0		; Bank0
-	MOVF	EEDATA,W		; W = EEDATA
+	MOVF	EEDATA,W		;结果放至w
 	RETURN
-WriteEEPROM
+Write_EEPROM
 	BSF		STATUS,RP0 ; Bank1
 	BCF		INTCON,GIE ; Disable INTs.
 	BSF		EECON1,WREN ; Enable Write

@@ -15,7 +15,6 @@ LED_DataL	EQU 0x26			;数码管显示数据低位
 LED_Data	EQU 0x27			;待显示的数码管输入数据
 Volume_Data	EQU 0x28			;M62649待输出音量值
 Volume_Cnt	EQU 0x29			;M62649待输出位统计
-
 ;初始化IO
 	ORG	0
 	BSF		STATUS,RP0
@@ -26,7 +25,6 @@ Volume_Cnt	EQU 0x29			;M62649待输出位统计
 	BCF		STATUS,RP0
 	CLRF	PORTA
 	CLRF	PORTB
-
 ;----------------------------------------------------------
 ;函数名称：Delay_3s
 ;功能描述：延时3秒启动系统，期间呼吸灯闪4次
@@ -34,7 +32,7 @@ Volume_Cnt	EQU 0x29			;M62649待输出位统计
 Delay_3s
 	BSF		OPTION_REG,0			;分频比256
 	BSF		OPTION_REG,1			;分频比256
-	BSF		OPTION_REG,2			;分频比256	
+	BSF		OPTION_REG,2			;分频比256
 	BCF		INTCON,T0IF				;将T0IF清0
 	MOVLW	0xE5					;76,循环1s
 	CLRF	TMR0					;重置TMR0
@@ -50,16 +48,20 @@ Delay_3s_1	BTFSS	INTCON,T0IF		;Timer0溢出否?
 	DECFSZ	Delay_3s_Cnt,1			;减一次Delay_3s_Cnt,到0跳下句
 	GOTO	Delay_3s_1				;继续Delay_3s_1
 ;----------------------------------------------------------
-;函数名称：Read_EEPROM
-;功能描述：读取EEPROM上次音量值数据
+;函数名称：Set_Init_Vol
+;功能描述：读取EEPROM上次音量值数据，渐进调整音量
+;
 ;----------------------------------------------------------
+Set_Init_Vol
 	MOVLW	0x20			; 读入地址
-	CALL	Read_EEPROM
-
-
+	CALL	Read_EEPROM		;输入地址到w，输出音量到w
+	MOVWF	Volume_Cnt		;渐进音量次数
+	
+	MOVLW	0
+	MOVWF	Volume_Data		;渐进初始值
+	MOVLW	20
 ;----------------------------------------------------------
 ;函数名称：Loop_Main
 ;功能描述：主循环函数
 ;----------------------------------------------------------
 Loop_Main
-
