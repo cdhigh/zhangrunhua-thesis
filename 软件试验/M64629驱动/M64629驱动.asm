@@ -28,7 +28,8 @@ Volume_Cnt	EQU 0x29
 ;¹¦ÄÜÃèÊö£ºM64629Çý¶¯
 ;----------------------------------------------------------
 	MOVLW	0x78
-SET_Volume	MOVWF	Volume_Data
+SET_Volume
+	MOVWF	Volume_Data
 	BSF		PORTB,4						;DATA:D0_RISE
 	BSF		PORTB,5						;CLOCK:0_RISE
 	BCF		PORTB,4						;DATA:D0_FALL

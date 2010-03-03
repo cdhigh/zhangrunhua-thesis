@@ -59,7 +59,11 @@ Set_Init_Vol
 	
 	MOVLW	0
 	MOVWF	Volume_Data		;渐进初始值
-	MOVLW	20
+	CALL	SET_Volume
+	INCF	Volume_Data,1
+	INCF	Volume_Data,1
+	DECFSZ	Volume_Cnt,1
+	
 ;----------------------------------------------------------
 ;函数名称：Loop_Main
 ;功能描述：主循环函数
