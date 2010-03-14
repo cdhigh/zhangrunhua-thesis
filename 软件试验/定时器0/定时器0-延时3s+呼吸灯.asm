@@ -27,5 +27,4 @@ Delay_3s_1	BTFSS	INTCON,T0IF		;Timer0溢出否?
 	;呼吸灯结束
 	DECFSZ	Delay_3s_Cnt,1			;减一次Delay_3s_Cnt,到0跳下句
 	GOTO	Delay_3s_1				;继续Delay_3s_1
-	BSF		PORTB,2					;开启喇叭继电器
 	END
