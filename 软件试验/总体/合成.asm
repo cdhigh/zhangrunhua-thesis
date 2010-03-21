@@ -5,23 +5,34 @@ Main_Status		EQU	0x10		;B7:µçÔ´×´Ì¬;B6:À®°È¼ÌµçÆ÷;B5:ÒôÁ¿Éý½µ±êÖ¾;B4:ÒôÁ¿Ö±µ÷±êÖ
 Key_Record		EQU	0x1D		;°´¼ü½á¹ûÊý¾Ý
 Key_AD_Count	EQU	0x1E		;°´¼üÉ¨Ãè´ÎÊýÍ³¼Æ
 Delay_3s_Cnt	EQU	0x1F		;3ÃëÑÓÊ±¼ÆÊýÆ÷
-Delay_Cnt0	EQU	0x20			;ÑÓÊ±¼ÆÊýÆ÷0
-Delay_Cnt1	EQU	0x21			;ÑÓÊ±¼ÆÊýÆ÷1
-LED_OutCnt	EQU	0x22			;ÊýÂë¹ÜÊä³ö¶ÎÂë¼ÆÊý
-LED_HalfDat	EQU	0x23			;°ë×Ö½Ú´ýÊä³öÊý¾Ý
-LED_CS		EQU 0x24			;ÊýÂë¹ÜÆ¬Ñ¡
-LED_DataH	EQU 0x25			;ÊýÂë¹ÜÏÔÊ¾Êý¾Ý¸ßÎ»
-LED_DataL	EQU 0x26			;ÊýÂë¹ÜÏÔÊ¾Êý¾ÝµÍÎ»
-LED_Data	EQU 0x27			;´ýÏÔÊ¾µÄÊýÂë¹ÜÊäÈëÊý¾Ý
-Volume_Data	EQU 0x28			;M62649´ýÊä³öÒôÁ¿Öµ
-Volume_Cnt	EQU 0x29			;M62649´ýÊä³öÎ»Í³¼Æ
+Delay_Cnt0		EQU	0x20		;ÑÓÊ±¼ÆÊýÆ÷0
+Delay_Cnt1		EQU	0x21		;ÑÓÊ±¼ÆÊýÆ÷1
+LED_OutCnt		EQU	0x22		;ÊýÂë¹ÜÊä³ö¶ÎÂë¼ÆÊý
+LED_HalfDat		EQU	0x23		;°ë×Ö½Ú´ýÊä³öÊý¾Ý
+LED_CS			EQU 0x24		;ÊýÂë¹ÜÆ¬Ñ¡
+LED_DataH		EQU 0x25		;ÊýÂë¹ÜÏÔÊ¾Êý¾Ý¸ßÎ»
+LED_DataL		EQU 0x26		;ÊýÂë¹ÜÏÔÊ¾Êý¾ÝµÍÎ»
+LED_Data		EQU 0x27		;´ýÏÔÊ¾µÄÊýÂë¹ÜÊäÈëÊý¾Ý
+Volume_Data		EQU 0x28		;M62649´ýÊä³öÒôÁ¿Öµ
+Volume_Cnt		EQU 0x29		;M62649´ýÊä³öÎ»Í³¼Æ
 ;----------------------------------------------------------
-;¹ý³ÌÃû³Æ£ºInitial
+;¹ý³ÌÃû³Æ£ºSTART
 ;°æ±¾×´Ì¬£ºÍê³É
-;¹¦ÄÜÃèÊö£º³õÊ¼»¯IO
+;¹¦ÄÜÃèÊö£º³ÌÐòÈë¿Ú
 ;----------------------------------------------------------
-Initial_IO
-	ORG	0
+START
+	ORG		0x00
+	NOP
+	GOTO	MAIN				;×ªÏòÖ÷³ÌÐò
+	ORG 	0x04
+	GOTO	INT_SERVER			;×ªÏòÖÐ¶Ï·þÎñ×Ó³ÌÐò
+;----------------------------------------------------------
+;*¹ý³ÌÃû³Æ£ºInitial_IO_AD_INT
+;°æ±¾×´Ì¬£ºÍê³É
+;¹¦ÄÜÃèÊö£º³õÊ¼»¯IOºÍADºÍINT
+;----------------------------------------------------------
+Initial_IO_AD
+;IO
 	BSF		STATUS,RP0
 	MOVLW	B'00001111'			;x'x'x'µçÔ´µçÑ¹¡®¹¦·ÅÖÐµã¡¯¼üÅÌ¡¯Êä³öµçÑ¹¡®µçÁ÷
 	MOVWF	TRISA
@@ -30,19 +41,11 @@ Initial_IO
 	BCF		STATUS,RP0
 	CLRF	PORTA
 	CLRF	PORTB
-;----------------------------------------------------------
-;*¹ý³ÌÃû³Æ£ºInitial_AD
-;°æ±¾×´Ì¬£º½øÐÐ
-;¹¦ÄÜÃèÊö£º³õÊ¼»¯AD
-;----------------------------------------------------------
-Initial_AD
-	BCF		STATUS,RP0			;Ìå0
-	MOVLW	B'01000001'			;D7 D6=01 AD×ª»»Ê±ÖÓÆµÂÊ= FOSC/8
-	MOVWF	ADCON0				;D5 D4 D3=000 AD×ª»»Ä£ÄâÍ¨µÀÑ¡ÔñRA0/AN0
-	BSF		STATUS,RP0			;Ìå1
-	MOVLW	B'00001110'			;D3 D2 D1 D0 1110Ñ¡ÔñRA0ÎªÄ£Äâ¿Ú¡£
-	MOVWF	ADCON1				;D7=0×ó¶ÔÆë ADRESLµÄµÍÁùÎ»¶Á×÷0
-	CLRF	ADRES
+;INT
+	MOVLW	B'11001000'			;ÍâÉèÖÐ¶ÏºÍRBÖÐ¶ÏÊ¹ÄÜ
+	MOVWF	INTCON
+	MOVLW	B'01000000'			;ADÖÐ¶ÏÊ¹ÄÜ
+	MOVWF	PIE1
 ;----------------------------------------------------------
 ;¹ý³ÌÃû³Æ£ºDelay_3s
 ;°æ±¾×´Ì¬£ºÍê³É
@@ -56,7 +59,7 @@ Delay_3s
 	MOVLW	0xE5				;76,Ñ­»·1s
 	CLRF	TMR0				;ÖØÖÃTMR0
 	MOVWF	Delay_3s_Cnt
-Delay_3s_1	
+Delay_3s_1
 	BTFSS	INTCON,T0IF	;Timer0Òç³ö·ñ?
 	GOTO	Delay_3s_1			;·ñ!·µ»ØÉÏÒ»²½
 	;ºôÎüµÆ¿ªÊ¼
@@ -85,8 +88,16 @@ Set_Init_Vol
 	BTFSS	STATUS,Z			;²âÊÔ½á¹ûÊÇ·ñ0
 	GOTO	Set_Init_Vol		;Volume_DataÓëVolume_Cnt²»Í¬¼ÌÐøÑ­»·
 ;----------------------------------------------------------
-;¹ý³ÌÃû³Æ£ºLoop_Main
-;¹¦ÄÜÃèÊö£ºÖ÷Ñ­»·º¯Êý
+;¹ý³ÌÃû³Æ£ºMAIN
+;¹¦ÄÜÃèÊö£ºÖ÷³ÌÐò
 ;----------------------------------------------------------
-Loop_Main
+MAIN
+;AD
+	BCF		STATUS,RP0			;Ìå0
+	MOVLW	B'01000001'			;D7 D6=01 AD×ª»»Ê±ÖÓÆµÂÊ= FOSC/8
+	MOVWF	ADCON0				;D5 D4 D3=000 AD×ª»»Ä£ÄâÍ¨µÀÑ¡ÔñRA0/AN0
+	BSF		STATUS,RP0			;Ìå1
+	MOVLW	B'00001110'			;D3 D2 D1 D0 1110Ñ¡ÔñRA0ÎªÄ£Äâ¿Ú¡£
+	MOVWF	ADCON1				;D7=0×ó¶ÔÆë ADRESLµÄµÍÁùÎ»¶Á×÷0
+	CLRF	ADRES				;ÏÈ½«AD½á¹ûÖÃ0
 	
