@@ -31,5 +31,8 @@ RE_LOW
 	DECFSZ	DELAY,F
 	GOTO	$-1
 	INCF	COUNT,F
+	;信号限定最大时间 +20%
+	MOVLW	((TIME_DECO * 6 / 5) / 20)
+	SUBWF	COUNT,W
 	
 	
