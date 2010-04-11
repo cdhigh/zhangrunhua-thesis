@@ -46,12 +46,13 @@ Initial_IO_AD
 	MOVWF	INTCON
 	MOVLW	B'01000000'			;AD中断使能
 	MOVWF	PIE1
+	RETURN
 ;----------------------------------------------------------
-;过程名称：Delay_3s
+;过程名称：Delay_Start
 ;版本状态：完成
 ;功能描述：延时3秒启动系统，期间呼吸灯闪4次
 ;----------------------------------------------------------
-Delay_3s
+Delay_Start
 	BSF		OPTION_REG,0		;分频比256
 	BSF		OPTION_REG,1		;分频比256
 	BSF		OPTION_REG,2		;分频比256
@@ -60,7 +61,7 @@ Delay_3s
 	CLRF	TMR0				;重置TMR0
 	MOVWF	Delay_3s_Cnt
 Delay_3s_1
-	BTFSS	INTCON,T0IF	;Timer0溢出否?
+	BTFSS	INTCON,T0IF			;Timer0溢出否?
 	GOTO	Delay_3s_1			;否!返回上一步
 	;呼吸灯开始
 	BTFSC	Delay_3s_Cnt,6		;3秒内,呼吸灯闪4次
@@ -70,11 +71,13 @@ Delay_3s_1
 	;呼吸灯结束
 	DECFSZ	Delay_3s_Cnt,1		;减一次Delay_3s_Cnt,到0跳下句
 	GOTO	Delay_3s_1			;继续Delay_3s_1
+	RETURN
 ;----------------------------------------------------------
 ;过程名称：Set_Init_Vol
 ;版本状态：完成
 ;功能描述：读取EEPROM上次音量值数据，渐进调整音量
 ;----------------------------------------------------------
+Set_Init_Vol
 	MOVLW	0x20				;读入上次关机音量存储EEPROM地址
 	CALL	Read_EEPROM			;输入地址到w，输出音量到w
 	MOVWF	Volume_Cnt			;渐进音量次数
@@ -87,40 +90,7 @@ Set_Init_Vol
 	XORWF	Volume_Cnt			;w中的Volume_Data与Volume_Cnt比较
 	BTFSS	STATUS,Z			;测试结果是否0
 	GOTO	Set_Init_Vol		;Volume_Data与Volume_Cnt不同继续循环
-;----------------------------------------------------------
-;过程名称：MAIN
-;功能描述：主程序
-;----------------------------------------------------------
-MAIN
-;自动调整音量
-	CALL	Read_Now_Vol		;读取当前音量到VOL_NOW
-	MOVLW	0					;最大音量记录VOL_MAX置0
-	MOVWF	VOL_MAX				;
-	MOVLW	0xF0				;最大值VOL_LIM到w
-	MOVWF	VOL_LIM				;
-	SUBWF	Volume_Data,1
-	BTFSC	STATUS,Z
-	GOTO	NOW_MORETHAN_LIMIT	;相等
-	BTFSS	STATUS,C
-	GOTO	NOW_MORETHAN_LIMIT	;当前音量大于极限
-	BTFSC	STATUS,C
-	GOTO	NOW_LESSTHAN_LIMIT	;当前音量小于极限
-NOW_MORETHAN_LIMIT
-	RRF		Volume_Data			;音量除以2(循环右移一位)
-	BCF		Volume_Data,7		;高位置0
-	CALL	SET_VOL				;应用音量
-	CALL	WAIT_500ms			;等待0.5s
-	CALL	Read_Now_Vol		;读取当前音量到VOL_NOW
-	MOVLW	VOL_LIM_2			;音量中间值VOL_LIM_2到w
-	SUBWF	Volume_Data,1		;当前音量与极限比较
-	BTFSC	STATUS,Z
-	GOTO	Auto_Vol			;当前音量与极限相等
-	BTFSS	STATUS,C
-	GOTO	Auto_Vol			;当前音量大于极限
-	CALL	WAIT_500ms			;等待0.5s
-	MOVF	VOL_MAX				;/剩余情况，当前音量小于极限
-	MOVWF	Volume_Data			;则音量设置为原值
-	CALL	SET_VOL				;应用音量
+	RETURN
 ;----------------------------------------------------------
 ;函数名称：LED_Display
 ;输入参数：音量Volume_Data
@@ -184,7 +154,7 @@ LOOP_BYTE
 	BSF	TRISA,2						;时间到，收回输出，设置片选高阻
 	COMF	LED_CS,1				;如果LED_CS取反
 	GOTO LOOP_LED
-	SLEEP
+	RETURN
 ;*****************段码表*****************
 TABLE1	ADDWF	PCL,1
 	RETLW	0X40;
@@ -200,14 +170,14 @@ TABLE1	ADDWF	PCL,1
 ;***************用于将高半字节的BIN码换成整字节的压缩BCD码**********
 BIN_HIGHHALF_BCD_TABLE
 	ADDWF    PCL,1
-	RETLW    B'00000000'     ;0
-	RETLW    B'00010110'     ;16
-	RETLW    B'00110010'     ;32
-	RETLW    B'01001000'     ;48
-	RETLW    B'01100100'     ;64
-	RETLW    B'10000000'     ;80
-	RETLW    B'10010110'     ;96
-	RETLW    B'00101000'     ;128,失掉了百位
+	RETLW    B'00000000'	;0
+	RETLW    B'00010110'	;16
+	RETLW    B'00110010'	;32
+	RETLW    B'01001000'	;48
+	RETLW    B'01100100'	;64
+	RETLW    B'10000000'	;80
+	RETLW    B'10010110'	;96
+	RETLW    B'00101000'	;128,失掉了百位
 ;***************用于将低半字节的BIN码换成整字节的压缩BCD码**********
 BIN_LOWHALF_BCD_TABLE
 	ADDWF    PCL,1
@@ -227,9 +197,8 @@ BIN_LOWHALF_BCD_TABLE
 	RETLW    B'00010011'     ;D
 	RETLW    B'00010100'     ;E
 	RETLW    B'00010101'     ;F
-;*****************延时20ms子程序*****************
 	GOTO	END_MAIN
-	
+;*****************延时20ms子程序*****************
 delay20ms
 	MOVLW	0x12
 	MOVWF	Delay_Cnt0
@@ -239,5 +208,81 @@ delayLoopB	DECFSZ	Delay_Cnt1
 	DECFSZ	Delay_Cnt0
 	GOTO	delayLoopA
 	RETURN
+
+;----------------------------------------------------------
+;Read_EEPROM
+;读取EEPROM数据
+;输入参数：读入地址到w
+;输出参数：输出数据在w
+;----------------------------------------------------------
+Read_EEPROM
+	BCF		STATUS,RP0		; Bank0
+	MOVWF	EEADR			;将地址赋予EEADR
+	BSF		STATUS,RP0		; Bank1
+	BSF		EECON1,RD		;读EEPROM
+	BCF		STATUS,RP0		; Bank0
+	MOVF	EEDATA,W		;结果放至w
+	RETURN
+;----------------------------------------------------------
+;Write_EEPROM
+;写EEPROM数据
+;输入参数：写地址到w，待写数据在BUFF_EE
+;----------------------------------------------------------
+Write_EEPROM
+	BSF		STATUS,RP0 		; Bank1
+	BCF		INTCON,GIE		;禁止中断
+	BSF		EECON1,WREN 	;启用写入
+	MOVLW	55h
+	MOVWF	EECON2			;55h写入EECON2
+	MOVLW	AAh				;开始写操作
+	MOVWF	EECON2
+	BSF		EECON1,WR		;置位WR开始写入
+	BSF		INTCON,GIE		;恢复启用中断
+	RETURN
+;----------------------------------------------------------
+;过程名称：Auto_Volume
+;功能描述：自动调整音量
+;----------------------------------------------------------
+Auto_Volume
+	CALL	Read_Now_Vol		;读取当前音量到VOL_NOW
+	MOVLW	0					;最大音量记录VOL_MAX置0
+	MOVWF	VOL_MAX				;
+	MOVLW	0xF0				;最大值VOL_LIM到w
+	MOVWF	VOL_LIM				;
+	SUBWF	Volume_Data,1
+	BTFSC	STATUS,Z
+	GOTO	NOW_MORETHAN_LIMIT	;相等
+	BTFSS	STATUS,C
+	GOTO	NOW_MORETHAN_LIMIT	;当前音量大于极限
+	BTFSC	STATUS,C
+	GOTO	NOW_LESSTHAN_LIMIT	;当前音量小于极限
+NOW_MORETHAN_LIMIT
+	RRF		Volume_Data			;音量除以2(循环右移一位)
+	BCF		Volume_Data,7		;高位置0
+	CALL	SET_VOL				;应用音量
+	CALL	WAIT_500ms			;等待0.5s
+	CALL	Read_Now_Vol		;读取当前音量到VOL_NOW
+	MOVLW	VOL_LIM_2			;音量中间值VOL_LIM_2到w
+	SUBWF	Volume_Data,1		;当前音量与极限比较
+	BTFSC	STATUS,Z
+	GOTO	Auto_Vol			;当前音量与极限相等
+	BTFSS	STATUS,C
+	GOTO	Auto_Vol			;当前音量大于极限
+	CALL	WAIT_500ms			;等待0.5s
+	MOVF	VOL_MAX				;/剩余情况，当前音量小于极限
+	MOVWF	Volume_Data			;则音量设置为原值
+	CALL	SET_VOL				;应用音量
+	RETURN
+;----------------------------------------------------------
+;过程名称：MAIN
+;功能描述：自动调整音量
+;----------------------------------------------------------
+MAIN
+	CALL	Initial_IO_AD		;初始化AD.IO
+	CALL	Delay_Start			;延时开机
+	CALL	Set_Init_Vol		;读取EEPROM上次音量值数据调整音量
+	CALL	LED_Display			;显示当前音量
+
 	END_MAIN
 	END
+
